@@ -1,0 +1,21 @@
+#!/bin/bash
+
+# get the clone url so we can start fresh
+CLONE_URL=$(git config --get remote.origin.url)
+
+if [[ $? -ne 0 ]]; then
+    echo 'Could not get upstream git url!' >&2
+    exit 1
+fi
+
+# create a temporary directory to do our work
+STARTDIR=$(pwd)
+WORKDIR=$(mktemp -d)
+cd "$WORKDIR"
+
+git clone --recursive "$CLONE_URL" build
+ls build
+
+# clean up our temporary directory and contents
+cd "$STARTDIR"
+rm -rf "$WORKDIR"
