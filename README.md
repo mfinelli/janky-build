@@ -4,7 +4,7 @@ When you can't afford a real server but need some build artifacts.
 
 ## Simple usage
 
-Clone the `jnaky-build` repository somewhere on your local machine. Then,
+Clone the `janky-build` repository somewhere on your local machine. Then,
 run the `build` command passing the desired name of the final archive:
 
 ```shell
@@ -16,7 +16,7 @@ automatically remove the `.git` directory and then `tar` and `gzip` the
 resulting directory and copy the archive back into the starting directory
 before cleaning the temporary files up.
 
-## Vagrant Usage
+## Vagrant usage
 
 A somewhat better approach is to run your janky build inside a vagrant box.
 This is helpful if anything needs to be compiled as you can be sure that
@@ -24,7 +24,7 @@ everything will be linked against the same libraries.
 
 Unfortunately, there is a hard requirment on folder sharing which means if
 you want to use Debian Jessie you need to use the "contrib" version.
-(`debian/contrib-jessie64`).
+(`debian/contrib-jessie64`)
 
 The vagrant build behaves in similar manner to the normal janky build but adds
 a few extra steps. It starts by making a fresh clone of the project on the
