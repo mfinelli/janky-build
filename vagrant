@@ -1,0 +1,74 @@
+#!/bin/bash
+
+#   Copyright 2017 Mario Finelli
+#
+#   Licensed under the Apache License, Version 2.0 (the "License");
+#   you may not use this file except in compliance with the License.
+#   You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#   Unless required by applicable law or agreed to in writing, software
+#   distributed under the License is distributed on an "AS IS" BASIS,
+#   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#   See the License for the specific language governing permissions and
+#   limitations under the License.
+
+# make sure that there _is_ a vagrant file...
+if [[ ! -f ./Vagrantfile ]]; then
+    echo "No vagrant file found!" >&2
+    exit 1
+fi
+
+# get the clone url so we can start fresh
+CLONE_URL=$(git config --get remote.origin.url)
+
+if [[ $? -ne 0 ]]; then
+    echo 'Could not get upstream git url!' >&2
+    exit 1
+fi
+
+STARTDIR=$(pwd)
+CLONEDIR=$(mktemp -d)
+
+cd "$CLONEDIR"
+git clone "$CLONE_URL" build
+tar cvzf build.tgz build
+cd "$STARTDIR"
+
+mv "$CLONEDIR/build.tgz" .
+
+# clean up the clone
+rm -rf "$CLONEDIR"
+
+read -r -d '' BUILD_SCRIPT <<'EOF'
+#!/bin/bash
+
+WORKDIR=$(mktemp -d)
+cd "$WORKDIR"
+
+mv /vagrant/build.tgz .
+tar xzvf build.tgz
+rm build.tgz
+
+cd build
+rm -rf .git
+make
+cd ..
+
+mv build "$1"
+tar cvf "$1".tar "$1"
+gzip --best "$1".tar
+
+mv "$1".tar.gz /vagrant/
+EOF
+
+echo "$BUILD_SCRIPT" > jb_build.bash
+chmod +x jb_build.bash
+
+vagrant up
+vagrant ssh -c "/vagrant/jb_build.bash '$1'"
+vagrant destroy
+
+rm jb_build.bash
+rm -f build.tgz
