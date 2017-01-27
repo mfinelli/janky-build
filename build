@@ -35,6 +35,12 @@ rm -rf build/.git
 # build our thing
 cd build
 make
+
+if [ $? -ne 0 ]; then
+    echo 'Build failed!' >&2
+    exit 1
+fi
+
 cd ..
 
 # package it all up
