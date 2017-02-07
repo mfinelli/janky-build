@@ -32,7 +32,7 @@ STARTDIR=$(pwd)
 CLONEDIR=$(mktemp -d)
 
 cd "$CLONEDIR"
-git clone "$CLONE_URL" build
+git clone --recursive "$CLONE_URL" build
 tar cvzf build.tgz build
 cd "$STARTDIR"
 
